@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Unity WebGL Player | _2D v3</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
@@ -75,28 +76,29 @@
       // the canvas DOM size and WebGL render target sizes yourself.
       // config.matchWebGLToCanvasSize = false;
 
+      var gameWidth = 960;
+      var gameHeight = 600;
+
+      function fitCanvas() {
+        var view = window.visualViewport;
+        var viewWidth = view ? view.width : window.innerWidth;
+        var viewHeight = view ? view.height : window.innerHeight;
+        var scale = Math.min(viewWidth / gameWidth, viewHeight / gameHeight);
+        canvas.style.width = Math.floor(gameWidth * scale) + "px";
+        canvas.style.height = Math.floor(gameHeight * scale) + "px";
+      }
+
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
         container.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-
-        unityShowBanner('WebGL builds are not supported on mobile devices.');
+        fitCanvas();
+        window.addEventListener("resize", fitCanvas);
+        window.addEventListener("orientationchange", fitCanvas);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", fitCanvas);
+        }
       } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+        canvas.style.width = gameWidth + "px";
+        canvas.style.height = gameHeight + "px";
       }
 
       loadingBar.style.display = "block";
